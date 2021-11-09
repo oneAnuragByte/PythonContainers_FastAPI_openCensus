@@ -1,0 +1,6 @@
+# to run the appliation, run the following:-
+# -- ensure that the dependencies are in place
+pip install -r requirement.txt
+
+# -- run "uvicorn" server and listen on port 80
+uvicorn main:app --host 0.0.0.0 --port 80
