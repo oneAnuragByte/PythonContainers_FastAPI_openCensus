@@ -12,7 +12,8 @@ docker build -t front-end:1.0.0 .
 $env:APPINSIGHT_CONN_KEY="<connection string>"
 
 # run docker container (browse http://127.0.0.1/me OR http://127.0.0.1/login depending on the container running)
-docker run --rm -p 80:8000 -e APPINSIGHT_CONN_KEY=$env:APPINSIGHT_CONN_KEY --name front-end front-end:1.0.0 
+docker run --rm -p 8001:8000 -e APPINSIGHT_CONN_KEY=$env:APPINSIGHT_CONN_KEY --name front-end
+docker run --rm -p 8002:8000 -e APPINSIGHT_CONN_KEY=$env:APPINSIGHT_CONN_KEY --name login
 
 #for test, use port 8001 for /me container and 8002 for /login container
 #use -d switch, if runnig in detached mode
