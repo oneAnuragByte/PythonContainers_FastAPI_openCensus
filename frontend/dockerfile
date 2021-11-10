@@ -7,4 +7,6 @@ RUN pip install -r requirement.txt
 
 EXPOSE 8000
 
+ENV IN_CONTAINER True
+
 CMD ["uvicorn", "main:app", "--host=0.0.0.0"]
