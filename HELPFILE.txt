@@ -8,8 +8,11 @@ uvicorn main:app --host 0.0.0.0 --port 80
 # build docker image locally (which exposes port 8000, default for uvicorn)
 docker build -t front-end:1.0.0 .
 
+# set connection string in environment variable
+$env:APPINSIGHT_CONN_KEY="<connection string>"
+
 # run docker container (browse http://127.0.0.1/me OR http://127.0.0.1/login depending on the container running)
-#docker run --rm -p 80:8000 --name front-end front-end:1.0.0 
+docker run --rm -p 80:8000 -e APPINSIGHT_CONN_KEY=$env:APPINSIGHT_CONN_KEY --name front-end front-end:1.0.0 
 
 #for test, use port 8001 for /me container and 8002 for /login container
 #use -d switch, if runnig in detached mode
