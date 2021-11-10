@@ -2,7 +2,7 @@
 # -- ensure that the dependencies are in place
 pip install -r requirement.txt
 
-# -- run "uvicorn" server and listen on port 80
+# -- run "uvicorn" server and listen on port 80 for test outside container
 uvicorn main:app --host 0.0.0.0 --port 80
 
 # build docker image locally (which exposes port 8000, default for uvicorn)
