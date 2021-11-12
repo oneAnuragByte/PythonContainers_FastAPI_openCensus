@@ -9,6 +9,7 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.tracer import Tracer
 from opencensus.trace.span import SpanKind
 from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
+from opencensus.trace import config_integration
 
 
 app = FastAPI()
@@ -21,7 +22,7 @@ HTTP_STATUS_CODE = COMMON_ATTRIBUTES['HTTP_STATUS_CODE']
 
 #callback to set Cloud role name
 def callback_add_role_name(envelope):
-    envelope.tags["ai.cloud.role"] = "front-end"
+    envelope.tags["ai.cloud.role"] = "front-end-v3"
     return True
 
 #---set logger to forward logs to ApplicationInsights
@@ -43,9 +44,17 @@ async def middlewareOpencensus(request: Request, call_next):
 
     tracer = Tracer(exporter=exporter,sampler=ProbabilitySampler(1.0))
     
-    with tracer.span("front-end") as span:
+    with tracer.span(name="front-end") as span:
         span.span_kind = SpanKind.SERVER
+        
+        #<debug>*******************
+        print(f"SPAN {span.span_id}" )
+        print(f"Trace ID {span.context_tracer.trace_id}" )
+        
+        request.state.span_id = str(span.span_id)
+        request.state.traceid = str(span.context_tracer.trace_id)
 
+        #</debug>*****************
         response = await call_next(request)
 
         tracer.add_attribute_to_current_span(
@@ -65,13 +74,18 @@ async def root(request: Request):
     now = datetime.now()
     current_time = now.strftime("%H:%M:%S")
     #-----------------#
-
-    logger.warning("Processing request at : " + current_time)
     
     response = ''
 
+
+
     if runningInContainer:
-        response = requests.get(url='http://host.docker.internal:8002/login')
+        #response = requests.get(url='http://host.docker.internal:8002/login')
+        header={"traceparent":f"00-{request.state.traceid}-{request.state.span_id}-01"}
+        
+        response = requests.get(url='http://host.docker.internal:8002/login', 
+                headers=header)
+        
         #response = requests.get(url="https://reqres.in/api/products/1")
     else:
         response = requests.get(url='http://localhost:8002/login')    
