@@ -9,8 +9,6 @@ from opencensus.trace.samplers import ProbabilitySampler
 from opencensus.trace.tracer import Tracer
 from opencensus.trace.span import SpanKind
 from opencensus.trace.attributes_helper import COMMON_ATTRIBUTES
-from opencensus.trace import config_integration
-
 
 app = FastAPI()
 
@@ -22,7 +20,7 @@ HTTP_STATUS_CODE = COMMON_ATTRIBUTES['HTTP_STATUS_CODE']
 
 #callback to set Cloud role name
 def callback_add_role_name(envelope):
-    envelope.tags["ai.cloud.role"] = "front-end-v3"
+    envelope.tags["ai.cloud.role"] = "front-end-v4"
     return True
 
 #---set logger to forward logs to ApplicationInsights
@@ -53,6 +51,7 @@ async def middlewareOpencensus(request: Request, call_next):
         
         request.state.span_id = str(span.span_id)
         request.state.traceid = str(span.context_tracer.trace_id)
+        
 
         #</debug>*****************
         response = await call_next(request)
@@ -66,7 +65,6 @@ async def middlewareOpencensus(request: Request, call_next):
 
     return response
 
-
 @app.get("/me")
 async def root(request: Request):
     
@@ -76,8 +74,6 @@ async def root(request: Request):
     #-----------------#
     
     response = ''
-
-
 
     if runningInContainer:
         #response = requests.get(url='http://host.docker.internal:8002/login')
