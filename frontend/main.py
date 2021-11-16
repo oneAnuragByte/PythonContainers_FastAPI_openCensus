@@ -1,6 +1,8 @@
 import requests
 import logging
 import os
+
+from requests.api import head
 from fastapi import FastAPI,Request
 from datetime import datetime
 from opencensus.ext.azure.log_exporter import AzureLogHandler
@@ -74,17 +76,18 @@ async def root(request: Request):
     #-----------------#
     
     response = ''
+    header={"traceparent":f"00-{request.state.traceid}-{request.state.span_id}-01"}
 
     if runningInContainer:
-        #response = requests.get(url='http://host.docker.internal:8002/login')
-        header={"traceparent":f"00-{request.state.traceid}-{request.state.span_id}-01"}
         
         response = requests.get(url='http://host.docker.internal:8002/login', 
                 headers=header)
         
         #response = requests.get(url="https://reqres.in/api/products/1")
     else:
-        response = requests.get(url='http://localhost:8002/login')    
+        response = requests.get(url='http://localhost:8002/login', 
+                headers=header)    
+                
         #response = requests.get(url="https://reqres.in/api/products/1")      
 
     return response.json()
